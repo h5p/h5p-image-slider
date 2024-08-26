@@ -40,24 +40,26 @@ H5P.ImageSlider = (function ($) {
     this.imageSlideHolders = [];
     this.determineAspectRatio();
 
-    for (var i = 0; i < this.options.imageSlides.length; i++) {
-      this.imageSlides[i] = H5P.newRunnable(this.options.imageSlides[i], this.id, undefined, undefined, {
-        aspectRatio: this.aspectRatio
-      });
-      this.imageSlides[i].on('loaded', function() {
-        self.trigger('resize');
-      });
-      this.imageSlideHolders[i] = false;
+    for (let i = 0; i < this.options.imageSlides.length; i++) {
+      if (this.options.imageSlides[i].params.image.params.file) { // Check if the image is set
+        this.imageSlides[i] = H5P.newRunnable(this.options.imageSlides[i], this.id, undefined, undefined, {
+          aspectRatio: this.aspectRatio
+        });
+        this.imageSlides[i].on('loaded', () => {
+          self.trigger('resize');
+        });
+        this.imageSlideHolders[i] = false;
+      }
     }
 
-    this.on('enterFullScreen', function() {
+    this.on('enterFullScreen', function () {
       self.enterFullScreen();
     });
-    this.on('exitFullScreen', function(){
+    this.on('exitFullScreen', function () {
       self.exitFullScreen();
     });
 
-    this.on('resize', function() {
+    this.on('resize', function () {
       var fullScreenOn = self.$container.hasClass('h5p-fullscreen') || self.$container.hasClass('h5p-semi-fullscreen');
       if (fullScreenOn) {
         self.$slides.css('height', '');
@@ -82,9 +84,9 @@ H5P.ImageSlider = (function ($) {
   /**
    * Set the aspect ratio for this image-slider
    */
-  C.prototype.determineAspectRatio = function() {
+  C.prototype.determineAspectRatio = function () {
     // Set aspectRatio to default
-    this.aspectRatio = 4/3;
+    this.aspectRatio = 4 / 3;
 
     // Try to identify aspectRatio according to settings
     switch (this.options.aspectRatioMode) {
@@ -121,17 +123,76 @@ H5P.ImageSlider = (function ($) {
    */
   C.prototype.attach = function ($container) {
     this.$container = $container;
-    // Set class on container to identify it as a greeting card
-    // container.  Allows for styling later.
+    // Set class on container to identify it as an image slider container
     $container.addClass("h5p-image-slider").addClass('h5p-image-slider-using-mouse');
 
-    $container.bind('keydown', function(e) {
+    $container.addClass(this.options.aspectRatioMode);
+    setTimeout(() => {
+      const imageContainer = this.$slidesHolder.find('.h5p-image-slide-image-holder.h5p-image');
+      const description = this.$slidesHolder.find('.h5p-image-description');
+      const sliderProgess = this.$slidesHolder.find('.h5p-image-slider-progress');
+      const image = $('.h5p-image-slide-image-holder img')
+      const descriptionHeight = description.length > 0 ? description[0].offsetHeight : 0;
+
+      imageContainer.height($container.height() - description[0].offsetHeight - sliderProgess[0].offsetHeight);
+      $container.height(imageContainer[0].offsetHeight + descriptionHeight + sliderProgess[0].offsetHeight)
+      sliderProgess.css('top', imageContainer[0].offsetHeight + descriptionHeight + 'px');
+
+      if (this.options.aspectRatioMode === 'auto' || this.options.aspectRatioMode === 'custom') {
+        // If text overflows, insert the toggle button
+        if (description.length > 0 && window.getComputedStyle(description[0]).textOverflow === 'ellipsis') {
+          const toggleButton = $('<div>', {
+            class: 'h5p-description-toggle',
+            'aria-label': 'Expand',
+            role: 'button',
+          }).insertBefore(description);
+
+          // Adjust margin to accommodate toggle button
+          description.css({
+            'margin-top': toggleButton[0].offsetHeight * -1 + 'px',
+            'max-height': $container.height() * 0.5 + 'px',
+            'overflow': 'hidden'  // Hide overflow initially
+          });
+
+          // Handle click event for the toggle button
+          toggleButton.click(function () {
+            const isCollapsed = $(this).hasClass('collapsed');
+            const newLabel = isCollapsed ? 'Expand' : 'Collapse';
+            $(this).toggleClass('collapsed', !isCollapsed).attr('aria-label', newLabel);
+
+            if (!isCollapsed) {
+              description.css({
+                'display': 'block',
+                'overflow-y': 'auto',  // Add vertical scroll when expanded
+              });
+            } else {
+              description.css({
+                'display': '-webkit-box',
+                'overflow': 'hidden',  // Hide overflow when collapsed
+              });
+            }
+            imageContainer.height($container.height() - description[0].offsetHeight - sliderProgess[0].offsetHeight);
+          });
+        }
+      } else if (this.options.aspectRatioMode === 'notFixed') {
+        const sliderButton = this.$slidesHolder.find('.h5p-image-slider-button');
+        const sliderButtonText = this.$slidesHolder.find('.h5p-image-slider-button-text');
+        const sliderButtonBackground = this.$slidesHolder.find('.h5p-image-slider-button-background');
+
+        sliderButton.css('height', image[0].offsetHeight + 'px');
+        sliderButtonBackground.css('height', image[0].offsetHeight + 'px');
+        // 64 can be replaced with more dynamic sliderButtonText[0].offsetHeight but that renders slowly
+        sliderButtonText.css('top', (image[0].offsetHeight - 64) / 2 + 'px');
+      }
+    }, 0);
+
+    $container.bind('keydown', function (e) {
       var keyboardNavKeys = [32, 13, 9];
       if (keyboardNavKeys.indexOf(e.which) !== -1) {
         $container.removeClass('h5p-image-slider-using-mouse');
       }
     });
-    $container.bind('mousedown', function() {
+    $container.bind('mousedown', function () {
       $container.addClass('h5p-image-slider-using-mouse');
     });
 
@@ -181,7 +242,7 @@ H5P.ImageSlider = (function ($) {
    *
    * Many layout changes are handled on resize.
    */
-  C.prototype.enterFullScreen = function() {
+  C.prototype.enterFullScreen = function () {
     this.updateNavButtons();
     this.updateProgressBar();
   };
@@ -191,7 +252,7 @@ H5P.ImageSlider = (function ($) {
    *
    * Many layout changes are handled on resize.
    */
-  C.prototype.exitFullScreen = function() {
+  C.prototype.exitFullScreen = function () {
     for (var i = 0; i < this.imageSlides.length; i++) {
       this.imageSlides[i].resetAspectRatio();
     }
@@ -202,7 +263,7 @@ H5P.ImageSlider = (function ($) {
   /**
    * Adds the HTML for the next three slides to the DOM
    */
-  C.prototype.loadImageSlides = function() {
+  C.prototype.loadImageSlides = function () {
     // Load next three imageSlides (not all for performance reasons)
     for (var i = this.currentSlideId; i < this.imageSlides.length && i < this.currentSlideId + 3; i++) {
       if (this.imageSlideHolders[i] === false) {
@@ -224,7 +285,7 @@ H5P.ImageSlider = (function ($) {
   /**
    * Attaches controls to the DOM
    */
-  C.prototype.attachControls = function() {
+  C.prototype.attachControls = function () {
     var self = this;
     this.$leftButton = this.createControlButton(this.options.a11y.prevSlide, 'left');
     this.$rightButton = this.createControlButton(this.options.a11y.nextSlide, 'right');
@@ -234,7 +295,7 @@ H5P.ImageSlider = (function ($) {
       }
     });
 
-    C.handleButtonClick(this.$rightButton, function() {
+    C.handleButtonClick(this.$rightButton, function () {
       if (!self.dragging) {
         self.gotoSlide(self.currentSlideId + 1);
       }
@@ -251,7 +312,7 @@ H5P.ImageSlider = (function ($) {
   /**
    * Attaches the progress bar to the DOM
    */
-  C.prototype.attachProgressBar = function() {
+  C.prototype.attachProgressBar = function () {
     this.$progressBar = $('<ul>', {
       class: 'h5p-image-slider-progress'
     });
@@ -267,9 +328,9 @@ H5P.ImageSlider = (function ($) {
    * @param {Integer} index  - slide index the progress bare element corresponds to
    * @return {jQuery} - progress bar button
    */
-  C.prototype.createProgressBarElement = function(index) {
+  C.prototype.createProgressBarElement = function (index) {
     var self = this;
-    
+
     var $progressBarButton = $('<button>', {
       class: 'h5p-image-slider-progress-button',
       "aria-label": self.options.a11y.gotoSlide.replace('%slide', index + 1),
@@ -282,7 +343,7 @@ H5P.ImageSlider = (function ($) {
 
     $progressBarElement.append($progressBarButton);
 
-    C.handleButtonClick($progressBarButton, function() {
+    C.handleButtonClick($progressBarButton, function () {
       self.gotoSlide(index);
     });
 
@@ -299,7 +360,7 @@ H5P.ImageSlider = (function ($) {
    * @param {string} dir - next or prev
    * @return {jQuery} control button
    */
-  C.prototype.createControlButton = function(text, dir) {
+  C.prototype.createControlButton = function (text, dir) {
     var $controlButton = $('<div>', {
       class: 'h5p-image-slider-button ' + 'h5p-image-slider-' + dir + '-button',
     });
@@ -307,7 +368,7 @@ H5P.ImageSlider = (function ($) {
     var $controlBg = $('<div>', {
       class: 'h5p-image-slider-button-background'
     });
-     $controlButton.append($controlBg);
+    $controlButton.append($controlBg);
 
     var $controlText = $('<div>', {
       class: 'h5p-image-slider-button-text',
@@ -326,7 +387,7 @@ H5P.ImageSlider = (function ($) {
    * @param {Integer} slideId the index of the slide we want to go to
    * @return {Boolean} false if failed(typically the slide didn't exist), true if not
    */
-  C.prototype.gotoSlide = function(slideId) {
+  C.prototype.gotoSlide = function (slideId) {
     if (slideId < 0 || slideId >= this.imageSlideHolders.length) {
       return false;
     }
@@ -340,7 +401,7 @@ H5P.ImageSlider = (function ($) {
     if (!this.dragging) {
       this.prepareNextSlideForAnimation($nextSlide, nextSlideDirection);
     }
-    setTimeout(function() {
+    setTimeout(function () {
       $nextSlide.removeClass('h5p-image-slider-no-transition');
       $prevSlide.removeClass('h5p-image-slider-current')
         .addClass('h5p-image-slider-removing')
@@ -367,7 +428,7 @@ H5P.ImageSlider = (function ($) {
    * @param {jQuery} $nextSlide the slide to be prepared
    * @param {String} direction prev or next
    */
-  C.prototype.prepareNextSlideForAnimation = function($nextSlide, direction) {
+  C.prototype.prepareNextSlideForAnimation = function ($nextSlide, direction) {
     $nextSlide.removeClass('h5p-image-slider-past')
       .removeClass('h5p-image-slider-future')
       .addClass('h5p-image-slider-no-transition')
@@ -377,7 +438,7 @@ H5P.ImageSlider = (function ($) {
   /**
    * Updates all navigation buttons, typically toggling and positioning
    */
-  C.prototype.updateNavButtons = function() {
+  C.prototype.updateNavButtons = function () {
     if (this.currentSlideId >= this.imageSlides.length - 1) {
       this.$rightButton.hide();
     }
@@ -408,7 +469,7 @@ H5P.ImageSlider = (function ($) {
   C.prototype.updateProgressBar = function () {
     const oldProgressElement = $('.h5p-image-slider-current-progress-element', this.$container).removeClass('h5p-image-slider-current-progress-element');
     const newProgressElement = $('.h5p-image-slider-progress-element', this.$container).eq(this.currentSlideId).addClass('h5p-image-slider-current-progress-element');
-    
+
     if (oldProgressElement.children('.h5p-image-slider-progress-button').is(':focus')) {
       newProgressElement.children('.h5p-image-slider-progress-button').focus();
     }
@@ -417,7 +478,7 @@ H5P.ImageSlider = (function ($) {
     newProgressElement.children('.h5p-image-slider-progress-button').attr('aria-current', 'true');
 
     var heightInPercent = this.$currentSlide.height() / this.$slides.height() * 100;
-    $('.h5p-image-slider-progress', this.$container).css('top', heightInPercent + '%');
+    // $('.h5p-image-slider-progress', this.$container).css('top', heightInPercent + '%');
   };
 
   /**
@@ -425,7 +486,7 @@ H5P.ImageSlider = (function ($) {
    */
   C.prototype.initDragging = function () {
     var self = this;
-    this.$slidesHolder.on('touchstart', function(event) {
+    this.$slidesHolder.on('touchstart', function (event) {
       self.dragging = true;
       self.dragStartX = event.originalEvent.touches[0].pageX;
       self.$currentSlide.addClass('h5p-image-slider-dragging');
@@ -437,12 +498,12 @@ H5P.ImageSlider = (function ($) {
       }
     });
 
-    this.$slidesHolder.on('touchmove', function(event) {
+    this.$slidesHolder.on('touchmove', function (event) {
       event.preventDefault();
       self.dragActionUpdate(event.originalEvent.touches[0].pageX);
     });
 
-    this.$slidesHolder.on('touchend', function(event) {
+    this.$slidesHolder.on('touchend', function (event) {
       self.finishDragAction();
       if (self.dragStartTime !== false && self.isButton(event.target)) {
         // This was possibly a click
@@ -459,7 +520,7 @@ H5P.ImageSlider = (function ($) {
       self.dragStartTime = false;
     });
 
-    this.$slidesHolder.on('touchcancel', function() {
+    this.$slidesHolder.on('touchcancel', function () {
       self.finishDragAction();
       self.dragStartTime = false;
     });
@@ -519,7 +580,7 @@ H5P.ImageSlider = (function ($) {
   /**
    * Update the current and next slide in response to a drag action
    */
-  C.prototype.dragActionUpdate = function(x) {
+  C.prototype.dragActionUpdate = function (x) {
     this.dragXMovement = x - this.dragStartX;
     this.$currentSlide.css('transform', 'translateX(' + this.dragXMovement + 'px)');
     if (this.currentSlideId > 0) {
@@ -537,7 +598,7 @@ H5P.ImageSlider = (function ($) {
         $nextSlide.css('transform', 'translateX(100.001%)');
       }
       else {
-        $nextSlide.css('transform', 'translateX(' +(this.dragXMovement + $nextSlide.width()) + 'px)');
+        $nextSlide.css('transform', 'translateX(' + (this.dragXMovement + $nextSlide.width()) + 'px)');
       }
     }
   };
@@ -547,8 +608,8 @@ H5P.ImageSlider = (function ($) {
    *
    * Will either go back to the current slide or finish the transition to the next slide
    */
-  C.prototype.finishDragAction = function() {
-    $('.h5p-image-slider-dragging', this.$container).removeClass('h5p-image-slider-dragging').each(function() {
+  C.prototype.finishDragAction = function () {
+    $('.h5p-image-slider-dragging', this.$container).removeClass('h5p-image-slider-dragging').each(function () {
       this.style.removeProperty('transform');
     });
     this.dragStartX = undefined;
