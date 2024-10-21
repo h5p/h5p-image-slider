@@ -77,11 +77,27 @@ H5P.ImageSlider = (function ($) {
       }
       self.updateNavButtons();
       self.updateProgressBar();
+      self.adjustButtonHeights();
     });
   }
 
   C.prototype = Object.create(H5P.EventDispatcher.prototype);
   C.prototype.constructor = C;
+
+  /**
+   * Adjust the height of the buttons based on the height of the image holder.
+   */
+  C.prototype.adjustButtonHeights = function () {
+    const imageHolders = document.querySelectorAll('.h5p-image-slide-image-holder');
+    const buttons = document.querySelectorAll('.h5p-image-slider-button');
+
+    if (imageHolders.length > 0 && buttons.length > 0) {
+      const imageHeight = imageHolders[0].clientHeight; // Get the height of the image holder
+      buttons.forEach(button => {
+        button.style.height = `${imageHeight}px`; // Set the height of each button
+      });
+    }
+  };
 
   /**
    * Set the aspect ratio for this image-slider
@@ -174,6 +190,8 @@ H5P.ImageSlider = (function ($) {
     this.attachControls();
 
     this.attachDescription();
+
+    this.adjustButtonHeights();
   };
 
   /**
@@ -463,7 +481,7 @@ H5P.ImageSlider = (function ($) {
 
 
   /**
-   * Position the next slide correctly so that it is ready to be aimated in
+   * Position the next slide correctly so that it is ready to be animated in
    *
    * @param {jQuery} $nextSlide the slide to be prepared
    * @param {String} direction prev or next
