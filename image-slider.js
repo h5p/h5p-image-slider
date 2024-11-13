@@ -189,7 +189,7 @@ H5P.ImageSlider = (function ($) {
 
     this.attachControls();
 
-    this.attachDescription();
+    this.listenForDescriptionToggle();
 
     this.adjustButtonHeights();
   };
@@ -199,6 +199,52 @@ H5P.ImageSlider = (function ($) {
    */
   C.prototype.announceCurrentSlide = function () {
     this.$screenReaderAnnouncement.text(this.imageSlides[this.currentSlideId].image.alt);
+  };
+
+  C.prototype.listenForDescriptionToggle = function () {
+    const self = this;
+
+    // Function to toggle description visibility and adjust image container height
+    const toggleDescription = function () {
+      // Get the current slide’s image container and description
+      const $imageContainer = self.$slidesHolder.find(`.h5p-image-slide-holder:eq(${self.currentSlideId}) .h5p-image-slide-image-holder`);
+      const $description = self.$slidesHolder.find(`.h5p-image-slide-holder:eq(${self.currentSlideId}) .h5p-description-text-container`);
+
+      // Ensure we are working with the current slide's image and description elements
+      if ($imageContainer.length && $description.length) {
+        // Toggle collapsed state on description
+        const isCollapsed = $description.hasClass('collapsed');
+        $description.toggleClass('collapsed', !isCollapsed);
+
+        const descriptionHeight = $description.outerHeight(true);
+        const imageHeight = $imageContainer.data('original-height') || $imageContainer.height();
+
+        // Expand or collapse description and adjust image height accordingly
+        if (!isCollapsed) {
+          // Expanding the description
+          const newHeight = imageHeight - descriptionHeight;
+          $imageContainer.height(newHeight);
+        } else {
+          // Collapsing the description, restore original height
+          $imageContainer.height(imageHeight);
+        }
+
+        // Store the original height if not already stored
+        if (!$imageContainer.data('original-height')) {
+          $imageContainer.data('original-height', imageHeight);
+        }
+
+        // Emit an event for description toggle, indicating if it’s expanded or collapsed
+        self.trigger('descriptionToggled', { expanded: !isCollapsed });
+
+        // Trigger resize to apply fullscreen adjustments
+        self.trigger('resize');
+      }
+    };
+
+    // Bind the toggle function to both the toggle button and the description text container
+    this.$slidesHolder.on('click', '.h5p-description-toggle', toggleDescription);
+    this.$slidesHolder.on('click', '.h5p-description-text-container', toggleDescription);
   };
 
   /**
@@ -434,11 +480,19 @@ H5P.ImageSlider = (function ($) {
       return false;
     }
 
-    // Hide the description and toggle of the current slide immediately
+    // Collapse the description of the current slide before transition
     const $currentDescription = this.$currentSlide.find('.h5p-image-description');
     const $currentToggle = this.$currentSlide.find('.h5p-description-toggle');
-    $currentDescription.hide();
-    $currentToggle.hide();
+    if (!$currentDescription.hasClass('collapsed')) {
+      $currentDescription.addClass('collapsed').css({
+        'display': '-webkit-box',
+        'max-height': '2.5em',
+        'overflow': 'visible',
+      });
+      $currentToggle.css({
+        'transform': 'rotate(180deg)',
+      }).attr('aria-label', 'Expand description');
+    }
 
     $('.h5p-image-slider-removing', this.$container).removeClass('.h5p-image-slider-removing');
     var nextSlideDirection = (this.currentSlideId < slideId) ? 'future' : 'past';
@@ -446,7 +500,7 @@ H5P.ImageSlider = (function ($) {
     this.currentSlideId = slideId;
     this.loadImageSlides();
     var $prevSlide = this.$currentSlide;
-    var $nextSlide = (this.imageSlideHolders[slideId]);
+    var $nextSlide = this.imageSlideHolders[slideId];
 
     if (!this.dragging) {
       this.prepareNextSlideForAnimation($nextSlide, nextSlideDirection);
@@ -464,11 +518,13 @@ H5P.ImageSlider = (function ($) {
         .addClass('h5p-image-slider-current')
         .removeAttr('aria-hidden');
 
-      // Show the description and toggle of the next slide after transition
+      // Reset description styles on the new slide
       const $nextDescription = $nextSlide.find('.h5p-image-description');
-      const $nextToggle = $nextSlide.find('.h5p-description-toggle');
-      $nextDescription.show();
-      $nextToggle.show();
+      $nextDescription.addClass('collapsed').css({
+        'display': '-webkit-box',
+        'max-height': '2.5em',
+        'overflow': 'visible',
+      });
     }, 1);
 
     this.$currentSlide = $nextSlide;
@@ -712,5 +768,6 @@ H5P.ImageSlider = (function ($) {
     });
   };
 
+  console.log('image-slider.js loaded');
   return C;
 })(H5P.jQuery);
