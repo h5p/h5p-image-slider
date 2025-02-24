@@ -23,7 +23,6 @@
 
 .h5p-image-slider-slides-holder {
   position: relative;
-  margin-bottom: 2.5em;
 }
 
 .h5p-image-slider-button {
@@ -115,10 +114,7 @@
   margin: 0 auto;
   padding: 0.75em 0;
   text-align: center;
-  position: absolute;
   width: 100%;
-  transition: top 0.2s;
-  top: 100%;
   line-height: 0.5em;
 }
 
@@ -162,14 +158,18 @@
 }
 
 .h5p-image-slide-holder:first-child {
-  display: block;
   margin-left: 0;
+}
+
+.h5p-image-slide-holder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .h5p-image-slide-holder.h5p-image-slider-current {
   transition: left 0.32s;
   left: 0;
-  display: block;
   z-index: 2;
 }
 
@@ -181,10 +181,6 @@
 .h5p-image-slider-past {
   transition: left 0.35s;
   left: -100.1%;
-}
-
-.h5p-image-slider-removing {
-  display: block;
 }
 
 .h5p-image-slider-past.h5p-image-slider-no-transition {
@@ -231,28 +227,6 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
-}
-
-.h5p-image-description {
-  position: absolute;
-  bottom: 0;
-  background-color: black;
-  color: white;
-  padding: 5px;
-  font-size: 1em;
-  line-height: 1.5em;
-}
-
-.h5p-image-slider.auto .h5p-image-description,
-.h5p-image-slider.custom .h5p-image-description {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  -moz-line-clamp: 2;
 }
 
 .h5p-image-slide-image-holder img {

@@ -1,5 +1,8 @@
 var H5P = H5P || {};
 
+/** @constant {number} FULLSCREEN_DELAY_MS Time some browsers need to go to full screen and have sizes */
+const FULLSCREEN_DELAY_MS = 300;
+
 H5P.ImageSlider = (function ($) {
   /**
    * Constructor function.
@@ -28,8 +31,6 @@ H5P.ImageSlider = (function ($) {
       }
     }, options);
 
-    this.isDescriptionCollapsed = true;
-
     // Filter out slides without image
     this.options.imageSlides = this.options.imageSlides.filter(function (slide) {
       return slide.params && slide.params.image && slide.params.image.params && slide.params.image.params.file;
@@ -50,34 +51,38 @@ H5P.ImageSlider = (function ($) {
         this.imageSlides[i].on('loaded', () => {
           self.trigger('resize');
         });
+        this.imageSlides[i].on('sizeChanged', () => {
+          self.updateUI();
+        });
         this.imageSlideHolders[i] = false;
       }
     }
 
     this.on('enterFullScreen', function () {
-      self.enterFullScreen();
+      window.setTimeout(() => {
+        self.enterFullScreen();
+      }, FULLSCREEN_DELAY_MS);
     });
+
     this.on('exitFullScreen', function () {
-      self.exitFullScreen();
+      window.requestAnimationFrame(() => {
+        self.exitFullScreen();
+      });
     });
 
     this.on('resize', function () {
-      var fullScreenOn = self.$container.hasClass('h5p-fullscreen') || self.$container.hasClass('h5p-semi-fullscreen');
-      if (fullScreenOn) {
-        self.$slides.css('height', '');
-        var newAspectRatio = window.innerWidth / (window.innerHeight - self.$progressBar.outerHeight());
-        for (var i = 0; i < self.imageSlides.length; i++) {
-          self.imageSlides[i].setAspectRatio(newAspectRatio);
-        }
+      if (!!H5P.isFullscreen) {
+        this.handleFullscreenResize();
       }
       else {
-        if (self.aspectRatio && self.$slides) {
-          self.$slides.height(self.$slides.width() / self.aspectRatio);
-        }
+        this.handleNormalResize();
       }
-      self.updateNavButtons();
-      self.updateProgressBar();
-      self.adjustButtonHeights();
+
+      this.updateUI();
+
+      this.imageSlides.forEach((imageSlide) => {
+        imageSlide.trigger('resize');
+      });
     });
   }
 
@@ -85,17 +90,48 @@ H5P.ImageSlider = (function ($) {
   C.prototype.constructor = C;
 
   /**
+   * Handle resize when in fullscreen mode.
+   */
+  C.prototype.handleFullscreenResize = function () {
+    this.$slides.css('height', '');
+
+    const newAspectRatio = window.innerWidth / (window.innerHeight - this.$progressBar.outerHeight());
+    for (var i = 0; i < this.imageSlides.length; i++) {
+      this.imageSlides[i].setAspectRatio(newAspectRatio);
+    }
+
+    this.$slides.height(window.innerHeight - this.$progressBar.get(0).clientHeight);
+  }
+
+  /**
+   * Handle resize when not in fullscreen mode.
+   */
+  C.prototype.handleNormalResize = function () {
+    const descriptionMinHeight = this.imageSlides[this.currentSlideId].getDescriptionMinHeight();
+    if (this.aspectRatio) {
+      this.$slides?.height(this.$slides.width() / this.aspectRatio + descriptionMinHeight);
+    }
+    else {
+      const smallestAspectRatio = this.imageSlides.reduce((smallest, imageSlide) => {
+        return Math.min(smallest, imageSlide.getNaturalAspectRatio());
+      }, Infinity);
+
+      this.$slides?.height(this.$slides.width() / smallestAspectRatio + descriptionMinHeight);
+    }
+  }
+
+  /**
    * Adjust the height of the buttons based on the height of the image holder.
    */
   C.prototype.adjustButtonHeights = function () {
-    const imageHolders = document.querySelectorAll('.h5p-image-slide-image-holder');
-    const buttons = document.querySelectorAll('.h5p-image-slider-button');
+    const imageHeight = this.imageSlides[this.currentSlideId].getImageSize().height;
 
-    if (imageHolders.length > 0 && buttons.length > 0) {
-      const imageHeight = imageHolders[0].clientHeight; // Get the height of the image holder
-      buttons.forEach(button => {
-        button.style.height = `${imageHeight}px`; // Set the height of each button
-      });
+    if (this.$leftButton) {
+      this.$leftButton.get(0).style.height = `${imageHeight}px`;
+    }
+
+    if (this.$rightButton) {
+      this.$rightButton.get(0).style.height = `${imageHeight}px`;
     }
   };
 
@@ -189,8 +225,6 @@ H5P.ImageSlider = (function ($) {
 
     this.attachControls();
 
-    this.listenForDescriptionToggle();
-
     this.adjustButtonHeights();
   };
 
@@ -201,51 +235,13 @@ H5P.ImageSlider = (function ($) {
     this.$screenReaderAnnouncement.text(this.imageSlides[this.currentSlideId].image.alt);
   };
 
-  C.prototype.listenForDescriptionToggle = function () {
-    const self = this;
-
-    // Function to toggle description visibility and adjust image container height
-    const toggleDescription = function () {
-      // Get the current slide’s image container and description
-      const $imageContainer = self.$slidesHolder.find(`.h5p-image-slide-holder:eq(${self.currentSlideId}) .h5p-image-slide-image-holder`);
-      const $description = self.$slidesHolder.find(`.h5p-image-slide-holder:eq(${self.currentSlideId}) .h5p-description-text-container`);
-
-      // Ensure we are working with the current slide's image and description elements
-      if ($imageContainer.length && $description.length) {
-        // Toggle collapsed state on description
-        const isCollapsed = $description.hasClass('collapsed');
-        $description.toggleClass('collapsed', !isCollapsed);
-
-        const descriptionHeight = $description.outerHeight(true);
-        const imageHeight = $imageContainer.data('original-height') || $imageContainer.height();
-
-        // Expand or collapse description and adjust image height accordingly
-        if (!isCollapsed) {
-          // Expanding the description
-          const newHeight = imageHeight - descriptionHeight;
-          $imageContainer.height(newHeight);
-        } else {
-          // Collapsing the description, restore original height
-          $imageContainer.height(imageHeight);
-        }
-
-        // Store the original height if not already stored
-        if (!$imageContainer.data('original-height')) {
-          $imageContainer.data('original-height', imageHeight);
-        }
-
-        // Emit an event for description toggle, indicating if it’s expanded or collapsed
-        self.trigger('descriptionToggled', { expanded: !isCollapsed });
-
-        // Trigger resize to apply fullscreen adjustments
-        self.trigger('resize');
-      }
-    };
-
-    // Bind the toggle function to both the toggle button and the description text container
-    this.$slidesHolder.on('click', '.h5p-description-toggle', toggleDescription);
-    this.$slidesHolder.on('click', '.h5p-description-text-container', toggleDescription);
-  };
+  /**
+   * Update the UI of the image slider.
+   */
+  C.prototype.updateUI = function () {
+    this.updateNavButtons();
+    this.updateProgressBar();
+  }
 
   /**
    * Update layout when entering fullscreen.
@@ -253,8 +249,9 @@ H5P.ImageSlider = (function ($) {
    * Many layout changes are handled on resize.
    */
   C.prototype.enterFullScreen = function () {
-    this.updateNavButtons();
-    this.updateProgressBar();
+    this.updateUI();
+
+    this.trigger('resize');
   };
 
   /**
@@ -263,11 +260,13 @@ H5P.ImageSlider = (function ($) {
    * Many layout changes are handled on resize.
    */
   C.prototype.exitFullScreen = function () {
-    for (var i = 0; i < this.imageSlides.length; i++) {
-      this.imageSlides[i].resetAspectRatio();
-    }
-    this.updateNavButtons();
-    this.updateProgressBar();
+    this.imageSlides.forEach((imageSlide) => {
+      imageSlide.resetAspectRatio();
+    });
+
+    this.updateUI();
+
+    this.trigger('resize');
   };
 
   /**
@@ -313,8 +312,9 @@ H5P.ImageSlider = (function ($) {
 
     this.$slidesHolder.append(this.$leftButton);
     this.$slidesHolder.append(this.$rightButton);
-    this.updateNavButtons();
     this.attachProgressBar();
+    this.updateUI();
+
     this.initDragging();
     this.initKeyEvents();
   };
@@ -329,86 +329,8 @@ H5P.ImageSlider = (function ($) {
     for (var i = 0; i < this.imageSlides.length; i++) {
       this.$progressBar.append(this.createProgressBarElement(i));
     }
-    this.$slidesHolder.append(this.$progressBar);
+    this.$container.append(this.$progressBar);
   };
-
-  /**
-    * Attaches the description bar to the DOM
-    */
-  C.prototype.attachDescription = function () {
-    const $container = this.$container;
-
-    // Render content after DOM is ready
-    const renderContent = () => {
-      const imageContainer = this.$slidesHolder.find('.h5p-image-slide-image-holder.h5p-image');
-      const description = this.$slidesHolder.find('.h5p-image-description');
-      const sliderProgess = this.$slidesHolder.find('.h5p-image-slider-progress');
-      const descriptionHeight = description.length > 0 ? description[0].offsetHeight : 0;
-
-      // Adjust container sizes based on description and progress bar
-      imageContainer.height($container.height() - descriptionHeight - sliderProgess[0].offsetHeight);
-      $container.height(imageContainer[0].offsetHeight + descriptionHeight + sliderProgess[0].offsetHeight);
-      sliderProgess.css('top', imageContainer[0].offsetHeight + descriptionHeight + 'px');
-
-      // Check if description overflows and insert a toggle button
-      if (this.options.aspectRatioMode === 'auto' || this.options.aspectRatioMode === 'custom') {
-        if (description.length > 0 && window.getComputedStyle(description[0]).textOverflow === 'ellipsis') {
-          const toggleButton = $('<div>', {
-            class: 'h5p-description-toggle',
-            'aria-label': self.isDescriptionCollapsed ? 'Expand' : 'Collapse',
-            role: 'button',
-          }).insertBefore(description);
-
-          // Adjust margin and height based on the toggle button
-          description.css({
-            'margin-top': toggleButton[0].offsetHeight * -1 + 'px',
-            'max-height': $container.height() * 0.5 + 'px',
-            'overflow': 'hidden'  // Initially hide overflow
-          });
-
-          // Toggle button functionality
-          toggleButton.click(function () {
-            const isCollapsed = self.isDescriptionCollapsed;
-            const newLabel = isCollapsed ? 'Expand' : 'Collapse';
-            $(this).toggleClass('collapsed', !isCollapsed).attr('aria-label', newLabel);
-
-            self.isDescriptionCollapsed = !isCollapsed;
-
-            if (!isCollapsed) {
-              description.css({
-                'display': 'block',
-                'overflow-y': 'auto',  // Enable vertical scrolling
-                '-webkit-overflow-scrolling': 'touch',
-                'touch-action': 'auto'
-              });
-              toggleButton.css({
-                'transform': 'rotate(0deg)',
-                'border-radius': '25px 25px 0 0',
-                'background-position': 'center 11px'
-              })
-            } else {
-              description.css({
-                'display': '-webkit-box',
-                'overflow': 'hidden',  // Collapse overflow
-              });
-              toggleButton.css({
-                'transform': 'rotate(180deg)',
-                'border-radius': '0 0 25px 25px',
-                'background-position': 'center 8px'
-              })
-            }
-
-            // Recalculate image container height after description expands/collapses
-            imageContainer.height($container.height() - description[0].offsetHeight - sliderProgess[0].offsetHeight);
-          });
-        }
-      }
-    };
-
-    // Ensure content is rendered after DOM is fully ready
-    requestAnimationFrame(renderContent);
-  };
-
 
   /**
    * Creates a progress bar button
@@ -481,18 +403,7 @@ H5P.ImageSlider = (function ($) {
     }
 
     // Collapse the description of the current slide before transition
-    const $currentDescription = this.$currentSlide.find('.h5p-image-description');
-    const $currentToggle = this.$currentSlide.find('.h5p-description-toggle');
-    if (!$currentDescription.hasClass('collapsed')) {
-      $currentDescription.addClass('collapsed').css({
-        'display': '-webkit-box',
-        'max-height': '2.5em',
-        'overflow': 'visible',
-      });
-      $currentToggle.css({
-        'transform': 'rotate(180deg)',
-      }).attr('aria-label', 'Expand description');
-    }
+    this.imageSlides[this.currentSlideId].toggleDescription(false);
 
     $('.h5p-image-slider-removing', this.$container).removeClass('.h5p-image-slider-removing');
     var nextSlideDirection = (this.currentSlideId < slideId) ? 'future' : 'past';
@@ -517,21 +428,14 @@ H5P.ImageSlider = (function ($) {
         .removeClass('h5p-image-slider-future')
         .addClass('h5p-image-slider-current')
         .removeAttr('aria-hidden');
-
-      // Reset description styles on the new slide
-      const $nextDescription = $nextSlide.find('.h5p-image-description');
-      $nextDescription.addClass('collapsed').css({
-        'display': '-webkit-box',
-        'max-height': '2.5em',
-        'overflow': 'visible',
-      });
     }, 1);
 
     this.$currentSlide = $nextSlide;
 
     this.announceCurrentSlide();
-    this.updateNavButtons();
-    this.updateProgressBar();
+    this.updateUI();
+    this.imageSlides[this.currentSlideId].trigger('resize');
+
     return true;
   };
 
@@ -554,24 +458,20 @@ H5P.ImageSlider = (function ($) {
    */
   C.prototype.updateNavButtons = function () {
     if (this.currentSlideId >= this.imageSlides.length - 1) {
-      this.$rightButton.hide();
+      this.$rightButton?.hide();
     }
     else {
-      this.$rightButton.show();
+      this.$rightButton?.show();
     }
+
     if (this.currentSlideId <= 0) {
-      this.$leftButton.hide();
+      this.$leftButton?.hide();
     }
     else {
-      this.$leftButton.show();
+      this.$leftButton?.show();
     }
-    var heightInPercent = 100;
-    var fullScreenOn = this.$container.hasClass('h5p-fullscreen') || this.$container.hasClass('h5p-semi-fullscreen');
-    if (!fullScreenOn) {
-      heightInPercent = this.$currentSlide.height() / this.$slides.height() * 100;
-    }
-    this.$leftButton.css('height', heightInPercent + '%');
-    this.$rightButton.css('height', heightInPercent + '%');
+
+    this.adjustButtonHeights();
   };
 
   /**
@@ -590,9 +490,6 @@ H5P.ImageSlider = (function ($) {
 
     oldProgressElement.children('.h5p-image-slider-progress-button').attr('aria-current', 'false');
     newProgressElement.children('.h5p-image-slider-progress-button').attr('aria-current', 'true');
-
-    var heightInPercent = this.$currentSlide.height() / this.$slides.height() * 100;
-    // $('.h5p-image-slider-progress', this.$container).css('top', heightInPercent + '%');
   };
 
   /**
@@ -768,6 +665,5 @@ H5P.ImageSlider = (function ($) {
     });
   };
 
-  console.log('image-slider.js loaded');
   return C;
 })(H5P.jQuery);
