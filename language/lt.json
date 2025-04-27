@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Paveikslai",
+      "entity": "image slide",
       "field": {
         "label": "Paveiksliuko skaidrė",
         "fields": [

@@ -3,6 +3,7 @@
     "label": "Images",
     "name": "imageSlides",
     "type": "list",
+    "entity": "image slide",
     "field": {
       "label": "Image Slide",
       "name": "imageSlide",

@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Kuvat",
+      "entity": "image slide",
       "field": {
         "label": "Liukuvat kuvat",
         "fields": [

@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Imaxes",
+      "entity": "image slide",
       "field": {
         "label": "Pase de Dipositivas",
         "fields": [

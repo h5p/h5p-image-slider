@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Irudiak",
+      "entity": "image slide",
       "field": {
         "label": "Irudien Aurkezpena",
         "fields": [

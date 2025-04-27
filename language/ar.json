@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "صور",
+      "entity": "image slide",
       "field": {
         "label": "شريحة صور",
         "fields": [
