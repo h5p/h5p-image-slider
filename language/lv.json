@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Attēli",
+      "entity": "image slide",
       "field": {
         "label": "Attēla slaids",
         "fields": [

@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Imatges",
+      "entity": "image slide",
       "field": {
         "label": "Diapositiva d’imatge",
         "fields": [

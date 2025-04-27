@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Immagini",
+      "entity": "image slide",
       "field": {
         "label": "Image Slide",
         "fields": [

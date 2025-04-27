@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Slike",
+      "entity": "image slide",
       "field": {
         "label": "Slikovni drsnik",
         "fields": [

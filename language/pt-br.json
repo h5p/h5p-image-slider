@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Imagens",
+      "entity": "image slide",
       "field": {
         "label": "Slide de Imagem",
         "fields": [

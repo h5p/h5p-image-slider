@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Prente",
+      "entity": "image slide",
       "field": {
         "label": "Prent skyfie",
         "fields": [

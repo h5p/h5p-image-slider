@@ -2,6 +2,7 @@
   "semantics": [
     {
       "label": "Obrázky",
+      "entity": "image slide",
       "field": {
         "label": "Presentace obrázků",
         "fields": [
