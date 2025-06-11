@@ -72,6 +72,32 @@
     ]
   },
   {
+    "name": "autoSlide",
+    "type": "boolean",
+    "label": "Enable automatic slide change",
+    "importance": "low",
+    "default": false,
+    "description": "If enabled, the slides will change automatically after a certain time."
+  },
+  {
+    "name": "autoSlideTimeS",
+    "type": "number",
+    "label": "Time between automatic slide changes (in seconds)",
+    "importance": "low",
+    "default": 5,
+    "min": 1,
+    "description": "This is only used if automatic slide change is enabled.",
+    "widget": "showWhen",
+    "showWhen": {
+      "rules": [
+        {
+          "field": "autoSlide",
+          "equals": true
+        }
+      ]
+    }
+  },
+  {
     "name": "a11y",
     "type": "group",
     "label": "Image slider accessibility",
