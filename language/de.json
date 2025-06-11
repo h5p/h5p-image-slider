@@ -40,6 +40,14 @@
       ]
     },
     {
+      "label": "Automatischen Bildwechsel aktivieren",
+      "description": "Wenn aktiviert, wechseln die Bilder nach einer bestimmten Zeit automatisch."
+    },
+    {
+      "label": "Zeit zwischen automatischem Bildwechsel (in Sekunden)",
+      "description": "Dies wird nur verwendet, wenn der automatische Bildwechsel aktiviert ist."
+    },
+    {
       "label": "Barrierefreiheit des Image-Sliders",
       "fields": [
         {
