@@ -152,6 +152,10 @@
   padding: 0;
   font: inherit;
   cursor: pointer;
+
+  position: absolute;
+  top: 4px;
+  left: 0;
 }
 
 .h5p-image-slide-holder {
@@ -214,6 +218,7 @@
 
 .h5p-image-slider-using-mouse .h5p-image-slider-progress-element, .h5p-image-slider-using-mouse .h5p-image-slider-button-text {
   outline: none;
+  position: relative;
 }
 
 .h5p-image-slider-sr-only {
