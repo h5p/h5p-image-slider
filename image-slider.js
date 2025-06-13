@@ -123,7 +123,10 @@ H5P.ImageSlider = (function ($) {
     this.$container = $container;
     // Set class on container to identify it as a greeting card
     // container.  Allows for styling later.
-    $container.addClass("h5p-image-slider").addClass('h5p-image-slider-using-mouse');
+    $container
+      .addClass("h5p-image-slider")
+      .addClass('h5p-image-slider-using-mouse')
+      .addClass('h5p-theme');
 
     $container.bind('keydown', function(e) {
       var keyboardNavKeys = [32, 13, 9];
