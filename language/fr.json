@@ -40,6 +40,14 @@
       ]
     },
     {
+      "label": "Activer le changement automatique de diapositive",
+      "description": "Si activé, les diapositives défileront automatiquement après un certain temps."
+    },
+    {
+      "label": "Temps entre deux changements automatiques (en secondes)",
+      "description": "N'est utilisé que si le changement automatique de diapositive est activé."
+    },
+    {
       "label": "Paramètres d'accessibilité de l'album d'images",
       "fields": [
         {

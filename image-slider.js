@@ -16,6 +16,8 @@ H5P.ImageSlider = (function ($) {
           imageSlide: null
         }
       ],
+      autoSlide: false,
+      autoSlideTimeS: 5,
       a11y: {
         nextSlide: 'Next Image',
         prevSlide: 'Previous Image',
@@ -43,6 +45,10 @@ H5P.ImageSlider = (function ($) {
     this.imageSlides = [];
     this.imageSlideHolders = [];
     this.determineAspectRatio();
+    this.autoSlideTimeout = null;
+    this.autoSlideIntervallMS = this.options.autoSlide ?
+      (Math.max(1, this.options.autoSlideTimeS)) * 1000 :
+      Infinity;
 
     for (var i = 0; i < this.options.imageSlides.length; i++) {
       this.imageSlides[i] = H5P.newRunnable(this.options.imageSlides[i], this.id, undefined, undefined, {
@@ -82,6 +88,21 @@ H5P.ImageSlider = (function ($) {
 
   C.prototype = Object.create(H5P.EventDispatcher.prototype);
   C.prototype.constructor = C;
+
+  /**
+   * Schedule the content to jump to next slide in INTERVAL_MS milliseconds.
+   */
+  C.prototype.scheduleAutoSlide = function() {
+    if (!this.options.autoSlide) {
+      return;
+    }
+
+    window.clearTimeout(this.autoSlideTimeout);
+    this.autoSlideTimeout = window.setTimeout(() => {
+      this.gotoSlide((this.currentSlideId + 1) % this.imageSlides.length);
+      this.scheduleAutoSlide();
+    }, this.autoSlideIntervallMS);
+  };
 
   /**
    * Set the aspect ratio for this image-slider
@@ -178,6 +199,8 @@ H5P.ImageSlider = (function ($) {
     this.$currentSlide = this.imageSlideHolders[0].addClass('h5p-image-slider-current');
 
     this.attachControls();
+
+    this.scheduleAutoSlide();
   };
 
   /**
@@ -242,12 +265,14 @@ H5P.ImageSlider = (function ($) {
     C.handleButtonClick(this.$leftButton, function () {
       if (!self.dragging) {
         self.gotoSlide(self.currentSlideId - 1);
+        self.scheduleAutoSlide();
       }
     });
 
     C.handleButtonClick(this.$rightButton, function() {
       if (!self.dragging) {
         self.gotoSlide(self.currentSlideId + 1);
+        self.scheduleAutoSlide();
       }
     });
 
@@ -295,6 +320,7 @@ H5P.ImageSlider = (function ($) {
 
     C.handleButtonClick($progressBarButton, function() {
       self.gotoSlide(index);
+      self.scheduleAutoSlide();
     });
 
     if (index === 0) {
@@ -446,6 +472,7 @@ H5P.ImageSlider = (function ($) {
         var d = new Date();
         self.dragStartTime = d.getTime();
       }
+      window.clearTimeout(self.autoSlideTimeout);
     });
 
     this.$slidesHolder.on('touchmove', function(event) {
@@ -468,6 +495,7 @@ H5P.ImageSlider = (function ($) {
         }
       }
       self.dragStartTime = false;
+      self.scheduleAutoSlide();
     });
 
     this.$slidesHolder.on('touchcancel', function() {
