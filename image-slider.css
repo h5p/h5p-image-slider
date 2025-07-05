@@ -31,7 +31,6 @@
   top: 0;
   width: 15%;
   height: 100%;
-  text-align: right;
   color: #FFFFFF;
   cursor: pointer;
   z-index: 3;
@@ -90,6 +89,7 @@
 
 .h5p-image-slider-left-button {
   left: 0;
+  text-align: left;
   transition: height 0.2s;
 }
 
@@ -99,6 +99,7 @@
 
 .h5p-image-slider-right-button {
   left: 85%;
+  text-align: right;
   transition: height 0.2s;
 }
 
