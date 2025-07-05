@@ -198,23 +198,6 @@
 .h5p-content-controls {
   z-index: 4;
 }
-.h5p-image-slider .h5p-enable-fullscreen {
-  width: 2.25em;
-  height: 1.83em;
-  background: no-repeat url('images/full-screen-enter.svg');
-  background-color: rgba(0,0,0,0.25);
-  background-size: 1em 1em;
-  background-position: 0.625em 0.415em;
-  font-size: 1em;
-}
-
-.h5p-image-slider .h5p-enable-fullscreen:before {
-  content: '';
-}
-
-.h5p-image-slider .h5p-enable-fullscreen:hover {
-  background-color: rgba(0,0,0,0.35);
-}
 
 .h5p-image-slider-using-mouse .h5p-image-slider-progress-element, .h5p-image-slider-using-mouse .h5p-image-slider-button-text {
   outline: none;
