@@ -170,6 +170,13 @@ H5P.ImageSlider = (function ($) {
     this.$currentSlide = this.imageSlideHolders[0].addClass('h5p-image-slider-current');
 
     this.attachControls();
+    // Signal to use themed content controls
+    H5P.externalDispatcher.on('initialized', () => {
+      const contentControls = this.$container[0].querySelector('.h5p-content-controls');
+      if (contentControls) {
+        contentControls.classList.add('themed');
+      }
+    });
   };
 
   /**
