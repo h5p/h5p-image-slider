@@ -15,17 +15,11 @@
   "preloadedJs": [
     {
       "path": "image-slider.js"
-    },
-    {
-      "path": "@legacy/image-slider.js"
     }
   ],
   "preloadedCss": [
     {
       "path": "image-slider.css"
-    },
-    {
-      "path": "@legacy/image-slider.css"
     }
   ],
   "editorDependencies": [
