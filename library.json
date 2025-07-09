@@ -3,7 +3,7 @@
   "description": "Image Slider",
   "majorVersion": 1,
   "minorVersion": 1,
-  "patchVersion": 18,
+  "patchVersion": 19,
   "runnable": 1,
   "author": "Falcon",
   "license": "MIT",
@@ -15,11 +15,17 @@
   "preloadedJs": [
     {
       "path": "image-slider.js"
+    },
+    {
+      "path": "@legacy/image-slider.js"
     }
   ],
   "preloadedCss": [
     {
       "path": "image-slider.css"
+    },
+    {
+      "path": "@legacy/image-slider.css"
     }
   ],
   "editorDependencies": [
