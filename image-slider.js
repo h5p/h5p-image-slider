@@ -35,6 +35,10 @@ H5P.ImageSlider = (function ($) {
       return slide.params && slide.params.image && slide.params.image.params && slide.params.image.params.file;
     });
 
+    if (this.options.imageSlides.length === 0) {
+      return;
+    }
+
     // Keep provided id.
     this.id = id;
     this.currentSlideId = 0;
@@ -141,10 +145,17 @@ H5P.ImageSlider = (function ($) {
    * @param {jQuery} $container
    */
   C.prototype.attach = function ($container) {
+    if (this.options.imageSlides.length === 0) {
+      return;
+    }
+
     this.$container = $container;
     // Set class on container to identify it as a greeting card
     // container.  Allows for styling later.
-    $container.addClass("h5p-image-slider").addClass('h5p-image-slider-using-mouse');
+    $container
+      .addClass("h5p-image-slider")
+      .addClass('h5p-image-slider-using-mouse')
+      .addClass('h5p-theme');
 
     $container.bind('keydown', function(e) {
       var keyboardNavKeys = [32, 13, 9];
