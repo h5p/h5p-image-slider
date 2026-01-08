@@ -1,61 +1,61 @@
 {
   "semantics": [
     {
-      "label": "Images",
+      "label": "Bilete",
       "field": {
         "fields": [
           {
-            "label": "Image Slide"
+            "label": "Bilete"
           }
         ],
-        "label": "Image Slide"
+        "label": "Bilete"
       }
     },
     {
       "options": [
         {
-          "label": "Automatic"
+          "label": "Automatisk"
         },
         {
-          "label": "Custom"
+          "label": "Eigendefinert"
         },
         {
-          "label": "Not fixed"
+          "label": "Ikkje fast"
         }
       ],
-      "label": "Aspect ratio",
-      "description": "Automatic means fixed aspect ratio automatically determined based on the images"
+      "label": "Forhold mellom breidde og høgde",
+      "description": "Om du vel \"Automatisk\", beheld bileta forholdet mellom breidde og høgde."
     },
     {
-      "label": "Aspect Ratio Settings",
+      "label": "Innstillingar for forholdet mellom breidde og høgde",
       "fields": [
         {
-          "label": "Aspect ratio width",
-          "description": "If you use 4 here, and 3 for the height the aspect ratio will be 4:3"
+          "label": "Breidde",
+          "description": "Dersom du set 4 her og 3 for høgde, blir sideforholdet 4 : 3."
         },
         {
-          "label": "Aspect ratio height",
-          "description": "If you use 3 here, and 4 for the width the aspect ratio will be 4:3"
+          "label": "Høgde",
+          "description": "Dersom du set 3 her og 4 for breidde, blir sideforholdet 4 : 3."
         }
       ]
     },
     {
-      "label": "Image slider accessibility",
+      "label": "Tilgjengelegheit for biletserien",
       "fields": [
         {
-          "default": "Next Image",
-          "description": "This is only used for read-speakers. It won't be displayed.",
-          "label": "Label for next slide buttons"
+          "default": "Neste bilete",
+          "description": "Dette blir berre brukt av skjermlesar. Det blir ikkje vist.",
+          "label": "Namn på \"Neste bilete\"-knapp"
         },
         {
-          "label": "Label for previous slide buttons",
-          "default": "Previous Image",
-          "description": "This is only used for read-speakers. It won't be displayed."
+          "label": "Namn på \"Førre bilete\"-knapp",
+          "default": "Førre bilete",
+          "description": "Dette blir berre brukt av skjermlesar. Det blir ikkje vist."
         },
         {
-          "label": "Label for slide buttons",
-          "default": "Go to image %slide",
-          "description": "This is only used for read-speakers. It won't be displayed. %slide is a variable and will be replaced with the image number."
+          "label": "Namn på knappen for direktenavigasjon til bileta",
+          "default": "Gå til bilete %slide",
+          "description": "Dette blir berre brukt av skjermlesar. Det blir ikkje vist. %slide er ein variabel og blir erstatta med det aktuelle biletnummeret."
         }
       ]
     }

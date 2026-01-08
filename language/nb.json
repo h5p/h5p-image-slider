@@ -3,59 +3,59 @@
     {
       "label": "Bilder",
       "field": {
-        "label": "Bilde slide",
+        "label": "Bilde",
         "fields": [
           {
-            "label": "Bilde slide"
+            "label": "Bilde"
           }
         ]
       }
     },
     {
-      "label": "Aspect ratio",
-      "description": "Automatic means fixed aspect ratio automatically determined based on the images",
+      "label": "Forhold mellom bredde og høyde",
+      "description": "Hvis du velger \"Automatisk\", beholder bildene forholdet mellom bredde og høyde.",
       "options": [
         {
-          "label": "Automatic"
+          "label": "Automatisk"
         },
         {
-          "label": "Custom"
+          "label": "Egendefinert"
         },
         {
-          "label": "Not fixed"
+          "label": "Ikke fast"
         }
       ]
     },
     {
-      "label": "Aspect Ratio Settings",
+      "label": "Innstillinger for forholdet mellom bredde og høyde",
       "fields": [
         {
-          "label": "Aspect ratio width",
-          "description": "If you use 4 here, and 3 for the height the aspect ratio will be 4:3"
+          "label": "Bredde",
+          "description": "Hvis du setter 4 her og 3 for høyde, blir sideforholdet 4 : 3."
         },
         {
-          "label": "Aspect ratio height",
-          "description": "If you use 3 here, and 4 for the width the aspect ratio will be 4:3"
+          "label": "Høyde",
+          "description": "Hvis du setter 3 her og 4 for bredde, blir sideforholdet 4 : 3."
         }
       ]
     },
     {
-      "label": "Image slider accessibility",
+      "label": "Tilgjengelighet for bildeserien",
       "fields": [
         {
-          "label": "Label for next slide buttons",
-          "default": "Next Image",
-          "description": "This is only used for read-speakers. It won't be displayed."
+          "label": "Navn på \"Neste bilde\"-knapp",
+          "default": "Neste bilde",
+          "description": "Dette blir bare brukt av skjermleser. Det blir ikke vist."
         },
         {
-          "label": "Label for previous slide buttons",
-          "default": "Previous Image",
-          "description": "This is only used for read-speakers. It won't be displayed."
+          "label": "Navn på \"Forrige bilde\"-knapp",
+          "default": "Forrige bilde",
+          "description": "Dette blir bare brukt av skjermleser. Det blir ikke vist."
         },
         {
-          "label": "Label for slide buttons",
-          "default": "Go to image %slide",
-          "description": "This is only used for read-speakers. It won't be displayed. %slide is a variable and will be replaced with the image number."
+          "label": "Navn på knapp for direktenavigasjon til bildene",
+          "default": "Gå til bilde %slide",
+          "description": "Dette blir bare brukt av skjermleser. Det blir ikke vist. %slide er en variabel og blir erstattet med det aktuelle bildenummeret."
         }
       ]
     }
