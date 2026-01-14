@@ -33,6 +33,10 @@ H5P.ImageSlider = (function ($) {
       return slide.params && slide.params.image && slide.params.image.params && slide.params.image.params.file;
     });
 
+    if (this.options.imageSlides.length === 0) {
+      return;
+    }
+
     // Keep provided id.
     this.id = id;
     this.currentSlideId = 0;
@@ -120,6 +124,10 @@ H5P.ImageSlider = (function ($) {
    * @param {jQuery} $container
    */
   C.prototype.attach = function ($container) {
+    if (this.options.imageSlides.length === 0) {
+      return;
+    }
+
     this.$container = $container;
     // Set class on container to identify it as a greeting card
     // container.  Allows for styling later.
@@ -272,7 +280,7 @@ H5P.ImageSlider = (function ($) {
    */
   C.prototype.createProgressBarElement = function(index) {
     var self = this;
-    
+
     var $progressBarButton = $('<button>', {
       class: 'h5p-image-slider-progress-button',
       "aria-label": self.options.a11y.gotoSlide.replace('%slide', index + 1),
@@ -411,7 +419,7 @@ H5P.ImageSlider = (function ($) {
   C.prototype.updateProgressBar = function () {
     const oldProgressElement = $('.h5p-image-slider-current-progress-element', this.$container).removeClass('h5p-image-slider-current-progress-element');
     const newProgressElement = $('.h5p-image-slider-progress-element', this.$container).eq(this.currentSlideId).addClass('h5p-image-slider-current-progress-element');
-    
+
     if (oldProgressElement.children('.h5p-image-slider-progress-button').is(':focus')) {
       newProgressElement.children('.h5p-image-slider-progress-button').focus();
     }

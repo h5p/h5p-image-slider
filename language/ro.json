@@ -1,0 +1,63 @@
+{
+  "semantics": [
+    {
+      "label": "Imagini",
+      "field": {
+        "label": "Diapozitiv imagine",
+        "fields": [
+          {
+            "label": "Diapozitiv imagine"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Raport de aspect",
+      "description": "Automat înseamnă un raport de aspect fix, determinat automat pe baza imaginilor",
+      "options": [
+        {
+          "label": "Automat"
+        },
+        {
+          "label": "Personalizat"
+        },
+        {
+          "label": "Nefixat"
+        }
+      ]
+    },
+    {
+      "label": "Setări raport de aspect",
+      "fields": [
+        {
+          "label": "Lățime raport de aspect",
+          "description": "Dacă folosiți 4 aici și 3 pentru înălțime, raportul de aspect va fi 4:3"
+        },
+        {
+          "label": "Înălțime raport de aspect",
+          "description": "Dacă folosiți 3 aici și 4 pentru lățime, raportul de aspect va fi 4:3"
+        }
+      ]
+    },
+    {
+      "label": "Accesibilitate carusel de imagini",
+      "fields": [
+        {
+          "label": "Etichetă pentru butoanele de diapozitiv următor",
+          "default": "Imaginea următoare",
+          "description": "Aceasta este folosită doar de cititoarele de ecran. Nu va fi afișată."
+        },
+        {
+          "label": "Etichetă pentru butoanele de diapozitiv anterior",
+          "default": "Imaginea anterioară",
+          "description": "Aceasta este folosită doar de cititoarele de ecran. Nu va fi afișată."
+        },
+        {
+          "label": "Etichetă pentru butoanele de diapozitiv",
+          "default": "Mergi la imaginea %slide",
+          "description": "Aceasta este folosită doar de cititoarele de ecran. Nu va fi afișată. %slide este o variabilă și va fi înlocuită cu numărul imaginii."
+        }
+      ]
+    }
+  ]
+}
