@@ -12,6 +12,10 @@
     "iframe"
   ],
   "machineName": "H5P.ImageSlider",
+  "coreApi": {
+    "majorVersion": 1,
+    "minorVersion": 28
+  },
   "preloadedJs": [
     {
       "path": "image-slider.js"
