@@ -1,0 +1,26 @@
+{
+  "name": "h5p.imageslider",
+  "version": "1.1.24",
+  "description": "H5P Image Slider content type",
+  "main": "image-slider.js",
+  "scripts": {
+    "lint": "eslint *.js",
+    "lint:fix": "eslint *.js --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h5p/h5p-image-slider.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/h5p/h5p-image-slider/issues"
+  },
+  "homepage": "https://github.com/h5p/h5p-image-slider#readme",
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-h5p": "^1.0.3"
+  }
+}
