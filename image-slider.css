@@ -125,6 +125,7 @@
 }
 
 .h5p-image-slider-progress-element {
+  position: relative;
   list-style: none;
   display: inline-block;
   width: 1em;
