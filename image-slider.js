@@ -42,6 +42,7 @@ H5P.ImageSlider = (function ($) {
     this.currentSlideId = 0;
     this.imageSlides = [];
     this.imageSlideHolders = [];
+    this.progressTooltips = [];
     this.determineAspectRatio();
 
     for (var i = 0; i < this.options.imageSlides.length; i++) {
@@ -300,6 +301,15 @@ H5P.ImageSlider = (function ($) {
     if (index === 0) {
       $progressBarElement.addClass('h5p-image-slider-current-progress-element');
     }
+
+    if (H5P.Tooltip) {
+      this.progressTooltips[index] = new H5P.Tooltip($progressBarButton.get(0), {
+        tooltipSource: 'aria-label',
+        position: 'top',
+        ariaHidden: true
+      });
+    }
+
     return $progressBarElement;
   };
 
@@ -437,6 +447,10 @@ H5P.ImageSlider = (function ($) {
   C.prototype.initDragging = function () {
     var self = this;
     this.$slidesHolder.on('touchstart', function(event) {
+      var $target = $(event.target);
+      if (!self.isButton(event.target) && $target.closest('.h5p-image-slide-holder'). length === 0) {
+        return;
+      }
       self.dragging = true;
       self.dragStartX = event.originalEvent.touches[0].pageX;
       self.$currentSlide.addClass('h5p-image-slider-dragging');
@@ -449,11 +463,18 @@ H5P.ImageSlider = (function ($) {
     });
 
     this.$slidesHolder.on('touchmove', function(event) {
+      if (!self.dragging) {
+        return;
+      }
       event.preventDefault();
       self.dragActionUpdate(event.originalEvent.touches[0].pageX);
     });
 
     this.$slidesHolder.on('touchend', function(event) {
+      if (!self.dragging) {
+        self.dragStartTime = false;
+        return;
+      }
       self.finishDragAction();
       if (self.dragStartTime !== false && self.isButton(event.target)) {
         // This was possibly a click
@@ -471,6 +492,10 @@ H5P.ImageSlider = (function ($) {
     });
 
     this.$slidesHolder.on('touchcancel', function() {
+      if (!self.dragging) {
+        self.dragStartTime = false;
+        return;
+      }
       self.finishDragAction();
       self.dragStartTime = false;
     });
@@ -579,6 +604,9 @@ H5P.ImageSlider = (function ($) {
       else {
         this.$currentSlide.css('transform', 'translateX(0%)');
       }
+    }
+    else {
+      this.$currentSlide.css('transform', 'trnaslateX(0%)');
     }
     this.dragging = false;
     this.dragXMovement = 0;
