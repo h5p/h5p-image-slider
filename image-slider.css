@@ -205,6 +205,7 @@
 }
 .h5p-content-controls {
   z-index: 4;
+  margin: 2px 2px 0 0;
 }
 
 .h5p-image-slider-sr-only {
