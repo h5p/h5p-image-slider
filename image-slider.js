@@ -620,7 +620,7 @@ H5P.ImageSlider = (function ($) {
       }
     }
     else {
-      this.$currentSlide.css('transform', 'trnaslateX(0%)');
+      this.$currentSlide.css('transform', 'translateX(0%)');
     }
     this.dragging = false;
     this.dragXMovement = 0;
