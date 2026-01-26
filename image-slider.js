@@ -462,7 +462,7 @@ H5P.ImageSlider = (function ($) {
     var self = this;
     this.$slidesHolder.on('touchstart', function(event) {
       var $target = $(event.target);
-      if (!self.isButton(event.target) && $target.closest('.h5p-image-slide-holder'). length === 0) {
+      if (!self.isButton(event.target) && $target.closest('.h5p-image-slide-holder').length === 0) {
         return;
       }
       self.dragging = true;
