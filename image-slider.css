@@ -205,6 +205,12 @@
 }
 .h5p-content-controls {
   z-index: 4;
+  top: 3px;
+  right: 3px;
+}
+
+.h5p-theme.h5p-image-slider .h5p-content-controls .h5p-enable-fullscreen:focus-visible {
+  outline-offset: 0px;
 }
 
 .h5p-image-slider-sr-only {
