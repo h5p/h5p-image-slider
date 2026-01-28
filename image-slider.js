@@ -43,7 +43,6 @@ H5P.ImageSlider = (function ($) {
     this.imageSlides = [];
     this.imageSlideHolders = [];
     this.progressTooltips = [];
-    this.fullscreenTooltip = null;
     this.determineAspectRatio();
 
     for (var i = 0; i < this.options.imageSlides.length; i++) {
@@ -180,7 +179,6 @@ H5P.ImageSlider = (function ($) {
     this.$currentSlide = this.imageSlideHolders[0].addClass('h5p-image-slider-current');
 
     this.attachControls();
-    setTimeout(() => this.attachFullscreenTooltip(), 0);
   };
 
   /**
@@ -233,18 +231,6 @@ H5P.ImageSlider = (function ($) {
         this.$slides.append(this.imageSlideHolders[i]);
       }
     }
-  };
-
-  C.prototype.attachFullscreenTooltip = function () {
-    var fullscreenBtn = document.querySelector('.h5p-enable-fullscreen')
-
-
-    this.fullscreenTooltip = new H5P.Tooltip(fullscreenBtn, {
-      tooltipSource: 'aria-label',
-      text: fullscreenBtn.getAttribute('aria-label') || 'Fullscreen',
-      position: 'bottom',
-      ariaHidden: true
-    });
   };
 
   /**
