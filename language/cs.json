@@ -40,6 +40,14 @@
       ]
     },
     {
+      "label": "Enable automatic slide change",
+      "description": "If enabled, the slides will change automatically after a certain time."
+    },
+    {
+      "label": "Time between automatic slide changes (in seconds)",
+      "description": "This is only used if automatic slide change is enabled."
+    },
+    {
       "label": "Přístupnost presentace obrázků",
       "fields": [
         {
