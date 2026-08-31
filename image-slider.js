@@ -243,12 +243,14 @@ H5P.ImageSlider = (function ($) {
     C.handleButtonClick(this.$leftButton, function () {
       if (!self.dragging) {
         self.gotoSlide(self.currentSlideId - 1);
+        self.ensureNavButtonFocus(self.$leftButton);
       }
     });
 
     C.handleButtonClick(this.$rightButton, function() {
       if (!self.dragging) {
         self.gotoSlide(self.currentSlideId + 1);
+        self.ensureNavButtonFocus(self.$rightButton);
       }
     });
 
@@ -418,6 +420,21 @@ H5P.ImageSlider = (function ($) {
     }
     this.$leftButton.css('height', heightInPercent + '%');
     this.$rightButton.css('height', heightInPercent + '%');
+  };
+
+  /**
+   * Ensure that one of the navigation buttons remains focus.
+   * @param {jQuery} $button Calling button.
+   */
+  C.prototype.ensureNavButtonFocus = function($button) {
+    if (!$button) {
+      return;
+    }
+
+    const $antagonist = ($button === this.$leftButton) ? this.$rightButton : this.$leftButton;
+    if ($button.is(':hidden') && $antagonist.is(':visible')) {
+      $antagonist.get(0).querySelector('[role="button"]').focus();
+    }
   };
 
   /**
